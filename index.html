@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Trackie</title>
   <link rel="manifest" href="/Trackie/manifest.json" />
-  <meta name="theme-color" content="#090d16" />
+  <meta name="theme-color" content="#0a0f1d" />
   <link rel="apple-touch-icon" href="/Trackie/icon-512.png" />
 
   <!-- Firebase Compat Scripts -->
@@ -17,160 +17,58 @@
     :root {
       --bg: #090d16;
       --surface: rgba(18, 24, 38, 0.95);
+      --surface-card: #111827;
       --border: rgba(255, 255, 255, 0.08);
       --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.25);
       --primary-hover: #0ea5e9;
+      --accent: #6366f1;
       --text: #f8fafc;
       --muted: #94a3b8;
       --input-bg: #0f172a;
-      --danger: #f43f5e;
       --success: #10b981;
+      --danger: #ef4444;
+      --present: rgba(16, 185, 129, 0.15);
+      --absent: rgba(239, 68, 68, 0.15);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: radial-gradient(circle at 50% 0%, #172554, var(--bg));
+      background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+    }
+
+    /* Auth Screen Container */
+    #authView {
+      min-height: 100vh;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.25rem;
-      -webkit-font-smoothing: antialiased;
+      padding: 1.5rem;
+      background: radial-gradient(circle at 50% 0%, #1e1b4b, var(--bg));
     }
 
-    .container {
+    .auth-card {
       width: 100%;
       max-width: 420px;
-    }
-
-    .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(16px);
       border-radius: 20px;
       padding: 2rem 1.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .header h1 {
-      font-size: 1.85rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .header p {
-      font-size: 0.875rem;
-      color: var(--muted);
-      margin-top: 0.35rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-    }
-
-    label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-
-    .phone-input-wrap {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .prefix-box {
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      color: #ffffff;
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-glow);
-    }
-
-    button {
-      width: 100%;
-      background: linear-gradient(135deg, #0284c7, #38bdf8);
-      color: #041427;
-      font-weight: 700;
-      font-size: 0.95rem;
-      border: none;
-      border-radius: 12px;
-      padding: 0.9rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      margin-top: 0.25rem;
-    }
-
-    button:hover {
-      filter: brightness(1.1);
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button.secondary {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      font-weight: 500;
-    }
-
-    button.secondary:hover {
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.2);
     }
 
     .badge {
@@ -185,137 +83,246 @@
       border: 1px solid rgba(56, 189, 248, 0.2);
     }
 
-    .status-msg {
-      font-size: 0.85rem;
-      text-align: center;
-      min-height: 1.25rem;
-      margin-top: -0.25rem;
+    /* Top Nav */
+    .app-header {
+      background: rgba(15, 23, 42, 0.85);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    .status-msg.error { color: var(--danger); }
-    .status-msg.success { color: var(--success); }
+    .app-header h1 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
 
-    .hidden { display: none !important; }
+    .app-main {
+      flex: 1;
+      padding: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
 
-    /* Dashboard view */
-    .dashboard-header {
+    /* Selectors & Badges */
+    .class-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .class-chip {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .class-chip.active {
+      background: var(--primary);
+      color: #041427;
+      border-color: var(--primary);
+    }
+
+    /* Student List */
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
     }
 
-    .user-info {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .user-phone {
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
-
-    .stat-card {
-      background: rgba(255, 255, 255, 0.03);
+    .student-card {
+      background: var(--surface-card);
       border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 1rem;
-      border-radius: 12px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
 
-    .stat-num {
-      font-size: 1.5rem;
+    .student-card.present {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: var(--present);
+    }
+
+    .student-card.absent {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: var(--absent);
+    }
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .roll-pill {
+      font-size: 0.8rem;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
     }
 
-    .stat-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .student-name {
+      font-weight: 600;
+      font-size: 0.95rem;
     }
+
+    .status-indicator {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .present .status-indicator {
+      background: var(--success);
+      color: #041427;
+    }
+
+    .absent .status-indicator {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* Inputs and Buttons */
+    input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #041427;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- AUTHENTICATION CARD -->
-    <div id="authCard" class="card">
-      <div class="header">
+  <!-- AUTH VIEW -->
+  <div id="authView">
+    <div class="auth-card">
+      <div style="text-align:center;">
         <span class="badge">Apex Academic Cloud</span>
-        <h1 style="margin-top: 0.5rem;">Trackie</h1>
-        <p>Sign in via secure phone verification</p>
+        <h1 style="font-size:1.8rem; margin-top:0.5rem; font-weight:800;">Trackie</h1>
+        <p style="color:var(--muted); font-size:0.85rem; margin-top:0.25rem;">Attendance & Workspace Management</p>
       </div>
 
-      <div class="form-group">
-        <label for="instId">Workspace / Institute ID</label>
-        <input type="text" id="instId" value="inst_apex" autocomplete="off" />
-      </div>
-
-      <!-- Phone entry step -->
-      <div id="phoneStep" class="form-group" style="gap: 1rem;">
+      <div id="phoneStep" style="display:flex; flex-direction:column; gap:0.85rem;">
         <div>
-          <label for="phoneNumber">Mobile Number (10 Digits)</label>
-          <div class="phone-input-wrap" style="margin-top: 0.45rem;">
-            <div class="prefix-box">+91</div>
-            <input type="tel" id="phoneNumber" placeholder="9876543210" maxlength="10" inputmode="numeric" />
+          <label style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">Mobile Number</label>
+          <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
+            <div style="background:var(--input-bg); border:1px solid var(--border); color:var(--muted); border-radius:12px; padding:0.85rem 1rem; font-weight:600;">+91</div>
+            <input type="tel" id="phoneNumber" placeholder="9999999999" maxlength="10" inputmode="numeric" />
           </div>
         </div>
         <button id="btnSendOtp" type="button">Send OTP</button>
       </div>
 
-      <!-- OTP entry step (initially hidden) -->
-      <div id="otpStep" class="form-group hidden" style="gap: 1rem;">
+      <div id="otpStep" class="hidden" style="display:flex; flex-direction:column; gap:0.85rem;">
         <div>
-          <label for="otpCode">6-Digit SMS Verification Code</label>
-          <input type="number" id="otpCode" placeholder="123456" maxlength="6" inputmode="numeric" style="margin-top: 0.45rem;" />
+          <label style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">6-Digit OTP</label>
+          <input type="number" id="otpCode" placeholder="123456" maxlength="6" inputmode="numeric" style="margin-top:0.35rem;" />
         </div>
         <button id="btnVerifyOtp" type="button">Verify & Launch</button>
-        <button id="btnReset" type="button" class="secondary">Change Phone Number</button>
+        <button id="btnResetPhone" type="button" class="secondary">Back</button>
       </div>
 
       <div id="recaptchaContainer"></div>
-      <div id="statusMsg" class="status-msg"></div>
-    </div>
-
-    <!-- MAIN APP DASHBOARD (Hidden until logged in) -->
-    <div id="dashboardCard" class="card hidden">
-      <div class="dashboard-header">
-        <div>
-          <div class="user-info">Logged In Workspace</div>
-          <div id="displayUserPhone" class="user-phone">+91 0000000000</div>
-        </div>
-        <button id="btnSignOut" type="button" class="secondary" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.8rem; margin: 0;">Sign Out</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-num">Active</div>
-          <div class="stat-label">System Status</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="recordCount">0</div>
-          <div class="stat-label">Sync Records</div>
-        </div>
-      </div>
-
-      <div class="form-group" style="margin-top: 0.5rem;">
-        <button id="btnMarkAttendance" type="button">Record Test Entry</button>
-      </div>
+      <div id="authStatus" style="font-size:0.8rem; text-align:center; min-height:1rem;"></div>
     </div>
   </div>
 
+  <!-- WORKSPACE VIEW -->
+  <div id="appView" class="hidden">
+    <header class="app-header">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <h1>Trackie</h1>
+        <span class="badge" style="font-size:0.65rem;">FACULTY</span>
+      </div>
+      <button id="btnSignOut" type="button" class="secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;">Exit</button>
+    </header>
+
+    <main class="app-main">
+      <!-- Batch / Class Filter -->
+      <div class="class-bar">
+        <div class="class-chip active" onclick="switchBatch(this, 'Batch A - CS')">Batch A (CS)</div>
+        <div class="class-chip" onclick="switchBatch(this, 'Batch B - IT')">Batch B (IT)</div>
+        <div class="class-chip" onclick="switchBatch(this, 'Batch C - AI')">Batch C (AI)</div>
+      </div>
+
+      <!-- Quick Actions / Submission Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="section-title">Active Roll Sheet</div>
+          <p id="statsCounter" style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Present: 4 | Absent: 0</p>
+        </div>
+        <button id="btnSaveAttendance" type="button" style="font-size:0.85rem; padding:0.5rem 1rem;">Save Session</button>
+      </div>
+
+      <!-- Tap-to-toggle Attendance List -->
+      <div id="studentList" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+    </main>
+  </div>
+
   <script>
-    /* ================= FIREBASE CONFIGURATION ================= */
+    /* ================= FIREBASE INITIALIZATION ================= */
     const firebaseConfig = {
       apiKey: "AIzaSyAYvNTQGUufhD12qr1rAgwgjteaxzvw21o",
       authDomain: "trackie-eec82.firebaseapp.com",
@@ -330,142 +337,129 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    /* ================= DOM ELEMENTS ================= */
-    const authCard = document.getElementById('authCard');
-    const dashboardCard = document.getElementById('dashboardCard');
-    const phoneStep = document.getElementById('phoneStep');
-    const otpStep = document.getElementById('otpStep');
-    const statusMsg = document.getElementById('statusMsg');
-    const phoneNumberInput = document.getElementById('phoneNumber');
-    const otpCodeInput = document.getElementById('otpCode');
-    const btnSendOtp = document.getElementById('btnSendOtp');
-    const btnVerifyOtp = document.getElementById('btnVerifyOtp');
-    const btnReset = document.getElementById('btnReset');
-    const btnSignOut = document.getElementById('btnSignOut');
-    const displayUserPhone = document.getElementById('displayUserPhone');
-    const btnMarkAttendance = document.getElementById('btnMarkAttendance');
-    const recordCountDisplay = document.getElementById('recordCount');
+    /* ================= STUDENT ROSTER STATE ================= */
+    let currentBatch = 'Batch A - CS';
+    const students = [
+      { id: 1, name: "Aarav Sharma", roll: "01", status: "present" },
+      { id: 2, name: "Isha Patel", roll: "02", status: "present" },
+      { id: 3, name: "Rohan Verma", roll: "03", status: "present" },
+      { id: 4, name: "Sneha Nair", roll: "04", status: "present" },
+    ];
 
-    let confirmationResult = null;
+    function renderStudents() {
+      const container = document.getElementById('studentList');
+      container.innerHTML = '';
+      let presentCount = 0;
 
-    function setStatus(text, type = 'normal') {
-      statusMsg.textContent = text;
-      statusMsg.className = 'status-msg ' + (type === 'error' ? 'error' : type === 'success' ? 'success' : '');
+      students.forEach((s, idx) => {
+        if (s.status === 'present') presentCount++;
+        const card = document.createElement('div');
+        card.className = `student-card ${s.status}`;
+        card.onclick = () => toggleAttendance(idx);
+        card.innerHTML = `
+          <div class="student-info">
+            <span class="roll-pill">#${s.roll}</span>
+            <span class="student-name">${s.name}</span>
+          </div>
+          <div class="status-indicator">${s.status}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('statsCounter').textContent = 
+        `Present: ${presentCount} | Absent: ${students.length - presentCount}`;
     }
 
-    /* Invisible reCAPTCHA */
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptchaContainer', {
-      size: 'invisible'
+    function toggleAttendance(index) {
+      students[index].status = students[index].status === 'present' ? 'absent' : 'present';
+      renderStudents();
+    }
+
+    function switchBatch(el, batchName) {
+      document.querySelectorAll('.class-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentBatch = batchName;
+    }
+
+    /* Save Session to Cloud Firestore */
+    document.getElementById('btnSaveAttendance').addEventListener('click', () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const record = {
+        faculty: user.phoneNumber,
+        batch: currentBatch,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        records: students
+      };
+
+      db.collection('attendance_logs').add(record).then(() => {
+        alert("Attendance recorded to Apex Cloud.");
+      }).catch(err => alert("Sync error: " + err.message));
     });
 
-    /* Send OTP */
-    btnSendOtp.addEventListener('click', () => {
-      const rawNumber = phoneNumberInput.value.trim();
-      if (rawNumber.length < 10) {
-        setStatus("Please enter a valid 10-digit phone number.", "error");
-        return;
-      }
+    /* ================= AUTHENTICATION FLOW ================= */
+    let confirmationResult = null;
+    const authStatus = document.getElementById('authStatus');
 
-      const formattedNumber = "+91" + rawNumber;
-      btnSendOtp.disabled = true;
-      setStatus("Sending verification code...");
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptchaContainer', { size: 'invisible' });
 
-      auth.signInWithPhoneNumber(formattedNumber, window.recaptchaVerifier)
-        .then((result) => {
+    document.getElementById('btnSendOtp').addEventListener('click', () => {
+      const num = document.getElementById('phoneNumber').value.trim();
+      if (num.length < 10) return alert("Enter valid 10-digit number");
+
+      authStatus.textContent = "Requesting code...";
+      authStatus.style.color = "var(--primary)";
+
+      auth.signInWithPhoneNumber("+91" + num, window.recaptchaVerifier)
+        .then(result => {
           confirmationResult = result;
-          phoneStep.classList.add('hidden');
-          otpStep.classList.remove('hidden');
-          setStatus("Code sent successfully!", "success");
+          document.getElementById('phoneStep').classList.add('hidden');
+          document.getElementById('otpStep').classList.remove('hidden');
+          authStatus.textContent = "Code sent!";
         })
-        .catch((error) => {
-          console.error(error);
-          setStatus(error.message, "error");
-          btnSendOtp.disabled = false;
+        .catch(err => {
+          authStatus.textContent = err.message;
+          authStatus.style.color = "var(--danger)";
         });
     });
 
-    /* Verify OTP */
-    btnVerifyOtp.addEventListener('click', () => {
-      const code = otpCodeInput.value.trim();
-      if (code.length < 6) {
-        setStatus("Please enter the 6-digit code.", "error");
-        return;
-      }
-
-      btnVerifyOtp.disabled = true;
-      setStatus("Verifying code...");
+    document.getElementById('btnVerifyOtp').addEventListener('click', () => {
+      const code = document.getElementById('otpCode').value.trim();
+      authStatus.textContent = "Verifying...";
 
       confirmationResult.confirm(code)
-        .then((userCredential) => {
-          setStatus("Authorized!", "success");
-        })
-        .catch((error) => {
-          console.error(error);
-          setStatus("Invalid code. Please retry.", "error");
-          btnVerifyOtp.disabled = false;
+        .then(() => authStatus.textContent = "")
+        .catch(err => {
+          authStatus.textContent = "Invalid code. Please retry.";
+          authStatus.style.color = "var(--danger)";
         });
     });
 
-    /* Reset to enter phone again */
-    btnReset.addEventListener('click', () => {
-      otpStep.classList.add('hidden');
-      phoneStep.classList.remove('hidden');
-      btnSendOtp.disabled = false;
-      btnVerifyOtp.disabled = false;
-      otpCodeInput.value = '';
-      setStatus("");
+    document.getElementById('btnResetPhone').addEventListener('click', () => {
+      document.getElementById('otpStep').classList.add('hidden');
+      document.getElementById('phoneStep').classList.remove('hidden');
+      authStatus.textContent = "";
     });
 
-    /* Sign out */
-    btnSignOut.addEventListener('click', () => {
-      auth.signOut();
-    });
+    document.getElementById('btnSignOut').addEventListener('click', () => auth.signOut());
 
-    /* Attendance test trigger */
-    btnMarkAttendance.addEventListener('click', () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-
-      db.collection('attendance_test').add({
-        phone: currentUser.phoneNumber,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        setStatus("Activity synced to Firestore!", "success");
-      });
-    });
-
-    /* Auth state listener */
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(user => {
       if (user) {
-        authCard.classList.add('hidden');
-        dashboardCard.classList.remove('hidden');
-        displayUserPhone.textContent = user.phoneNumber;
-
-        // Listen to test updates in real-time
-        db.collection('attendance_test')
-          .where('phone', '==', user.phoneNumber)
-          .onSnapshot((snap) => {
-            recordCountDisplay.textContent = snap.size;
-          });
+        document.getElementById('authView').classList.add('hidden');
+        document.getElementById('appView').classList.remove('hidden');
+        renderStudents();
       } else {
-        dashboardCard.classList.add('hidden');
-        authCard.classList.remove('hidden');
-        phoneStep.classList.remove('hidden');
-        otpStep.classList.add('hidden');
-        btnSendOtp.disabled = false;
-        btnVerifyOtp.disabled = false;
-        otpCodeInput.value = '';
-        setStatus("");
+        document.getElementById('appView').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('phoneStep').classList.remove('hidden');
+        document.getElementById('otpStep').classList.add('hidden');
       }
     });
 
-    /* Register Service Worker for PWA */
+    /* Service Worker */
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/Trackie/sw.js')
-          .then(reg => console.log('ServiceWorker registered:', reg.scope))
-          .catch(err => console.log('ServiceWorker registration failed:', err));
-      });
+      navigator.serviceWorker.register('/Trackie/sw.js').catch(() => {});
     }
   </script>
 </body>
