@@ -1,53 +1,54 @@
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
+// This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
+
+const CACHE = "pwabuilder-offline-page";
+
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+
+// TODO: replace the following with the correct offline fallback page i.e.: const offlineFallbackPage = "offline.html";
+const offlineFallbackPage = "ToDo-replace-this-name.html";
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener('install', async (event) => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => cache.add(offlineFallbackPage))
+  );
 });
 
+if (workbox.navigationPreload.isSupported()) {
+  workbox.navigationPreload.enable();
+}
 
-self.addEventListener('push', (event) => {
-  let data = { title: 'Trackie Update', body: 'New notification received.', url: './index.html' };
-  try {
-    if (event.data) data = event.data.json();
-  } catch (e) {
-    if (event.data) data.body = event.data.text();
-  }
+workbox.routing.registerRoute(
+  new RegExp('/*'),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: CACHE
+  })
+);
 
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const preloadResp = await event.preloadResponse;
 
-  const options = {
-    body: data.body,
-    icon: './icon-512.png',
-    badge: './icon-512.png',
-    vibrate: [200, 100, 200],
-    data: { url: data.url }
-  };
+        if (preloadResp) {
+          return preloadResp;
+        }
 
+        const networkResp = await fetch(event.request);
+        return networkResp;
+      } catch (error) {
 
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
+        const cache = await caches.open(CACHE);
+        const cachedResp = await cache.match(offlineFallbackPage);
+        return cachedResp;
+      }
+    })());
+  }
 });
-
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const targetUrl = event.notification.data?.url || './index.html';
-
-
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      for (let client of windowClients) {
-        if (client.url.includes('index.html') && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
-    })
-  );
-});
-
