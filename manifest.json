@@ -3,10 +3,12 @@
   "dir": "ltr",
   "display": "standalone",
   "name": "Trackie",
-  "orientation": "any",
-  "scope": "/",
+  "orientation": "portrait-primary",
+  "scope": "/Trackie/",
   "short_name": "Trackie",
   "start_url": "/Trackie/index.html",
-  "theme_color": "#121214",
-  "lang": "en"
+  "theme_color": "#ffffff",
+  "lang": "en",
+  "id": "/Trackie/",
+  "description": "Student and attendance tracking workspace"
 }
