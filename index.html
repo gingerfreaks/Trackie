@@ -3,39 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Trackie</title>
+  <title>Trackie | Cloud Academic Workspace</title>
   <link rel="manifest" href="/Trackie/manifest.json" />
-  <meta name="theme-color" content="#0a0f1d" />
+  <meta name="theme-color" content="#090d16" />
   <link rel="apple-touch-icon" href="/Trackie/icon-512.png" />
 
-  <!-- Firebase Compat Scripts -->
+  <!-- Firebase SDKs (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     :root {
-      --bg: #090d16;
-      --surface: rgba(18, 24, 38, 0.95);
-      --surface-card: #111827;
+      --bg: #070b13;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-surface: #0f172a;
       --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.25);
       --primary: #38bdf8;
       --primary-hover: #0ea5e9;
-      --accent: #6366f1;
+      --primary-glow: rgba(56, 189, 248, 0.18);
       --text: #f8fafc;
       --muted: #94a3b8;
-      --input-bg: #0f172a;
-      --success: #10b981;
-      --danger: #ef4444;
-      --present: rgba(16, 185, 129, 0.15);
-      --absent: rgba(239, 68, 68, 0.15);
+      --present-bg: rgba(16, 185, 129, 0.12);
+      --present-border: rgba(16, 185, 129, 0.4);
+      --present-text: #34d399;
+      --absent-bg: rgba(244, 63, 94, 0.12);
+      --absent-border: rgba(244, 63, 94, 0.4);
+      --absent-text: #fb7185;
+      --late-bg: rgba(251, 191, 36, 0.12);
+      --late-border: rgba(251, 191, 36, 0.4);
+      --late-text: #fcd34d;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -45,188 +53,23 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Auth Screen Container */
-    #authView {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      background: radial-gradient(circle at 50% 0%, #1e1b4b, var(--bg));
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem 1.75rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
+    /* Common Components */
+    .hidden { display: none !important; }
 
     .badge {
-      display: inline-block;
-      align-self: center;
-      padding: 0.25rem 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
       border-radius: 9999px;
       font-size: 0.75rem;
       font-weight: 600;
-      background: rgba(56, 189, 248, 0.1);
+      background: var(--primary-glow);
       color: var(--primary);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-    }
-
-    /* Top Nav */
-    .app-header {
-      background: rgba(15, 23, 42, 0.85);
-      border-bottom: 1px solid var(--border);
-      padding: 0.85rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .app-header h1 {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #fff;
-    }
-
-    .app-main {
-      flex: 1;
-      padding: 1rem;
-      max-width: 600px;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    /* Selectors & Badges */
-    .class-bar {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding-bottom: 0.25rem;
-    }
-
-    .class-chip {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .class-chip.active {
-      background: var(--primary);
-      color: #041427;
-      border-color: var(--primary);
-    }
-
-    /* Student List */
-    .section-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .student-card {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .student-card.present {
-      border-color: rgba(16, 185, 129, 0.4);
-      background: var(--present);
-    }
-
-    .student-card.absent {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: var(--absent);
-    }
-
-    .student-info {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-    }
-
-    .roll-pill {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 0.25rem 0.5rem;
-      border-radius: 8px;
-    }
-
-    .student-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .status-indicator {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 0.35rem 0.75rem;
-      border-radius: 8px;
-      text-transform: uppercase;
-    }
-
-    .present .status-indicator {
-      background: var(--success);
-      color: #041427;
-    }
-
-    .absent .status-indicator {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    /* Inputs and Buttons */
-    input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      color: #fff;
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
-      font-size: 1rem;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: var(--primary);
+      border: 1px solid var(--border-accent);
     }
 
     button {
@@ -236,52 +79,311 @@
       font-size: 0.95rem;
       border: none;
       border-radius: 12px;
-      padding: 0.85rem 1rem;
+      padding: 0.85rem 1.25rem;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+      transition: all 0.15s ease;
     }
 
-    button.secondary {
-      background: transparent;
-      color: var(--muted);
+    button:hover { filter: brightness(1.1); }
+    button:active { transform: scale(0.98); }
+
+    button.btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
+      color: var(--text);
     }
 
-    .hidden { display: none !important; }
+    button.btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    button.btn-sm {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #020617;
+      border: 1px solid var(--border);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    /* Auth Screen */
+    #authView {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: radial-gradient(circle at 50% 0%, #172554, var(--bg));
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.25rem 1.75rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* App Shell */
+    .app-header {
+      background: rgba(15, 23, 42, 0.85);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-wrap h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    /* Tab Navigation */
+    .nav-bar {
+      display: flex;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1rem;
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      padding: 0.85rem 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .app-main {
+      flex: 1;
+      padding: 1.25rem 1rem 5rem 1rem;
+      max-width: 680px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Batch Picker */
+    .batch-scroller {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+      scrollbar-width: none;
+    }
+
+    .batch-chip {
+      background: var(--card-surface);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .batch-chip.active {
+      background: var(--primary);
+      color: #041427;
+      border-color: var(--primary);
+    }
+
+    /* Metric Cards */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .metric-card {
+      background: var(--card-surface);
+      border: 1px solid var(--border);
+      padding: 0.85rem;
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    /* Student List */
+    .student-item {
+      background: var(--card-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .student-item.present { background: var(--present-bg); border-color: var(--present-border); }
+    .student-item.absent { background: var(--absent-bg); border-color: var(--absent-border); }
+    .student-item.late { background: var(--late-bg); border-color: var(--late-border); }
+
+    .student-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .roll-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .student-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .action-triggers {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .status-btn {
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .status-btn.active-p { background: #10b981; color: #041427; }
+    .status-btn.active-a { background: #f43f5e; color: #fff; }
+    .status-btn.active-l { background: #f59e0b; color: #041427; }
+
+    /* Notices Feed */
+    .notice-card {
+      background: var(--card-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .notice-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
 
-  <!-- AUTH VIEW -->
+  <!-- ================= AUTH VIEW ================= -->
   <div id="authView">
     <div class="auth-card">
       <div style="text-align:center;">
-        <span class="badge">Apex Academic Cloud</span>
-        <h1 style="font-size:1.8rem; margin-top:0.5rem; font-weight:800;">Trackie</h1>
-        <p style="color:var(--muted); font-size:0.85rem; margin-top:0.25rem;">Attendance & Workspace Management</p>
+        <span class="badge"><i data-lucide="shield-check" style="width:14px; height:14px;"></i> Apex Academic Cloud</span>
+        <h1 style="font-size:1.85rem; font-weight:800; margin-top:0.75rem;">Trackie</h1>
+        <p style="color:var(--muted); font-size:0.85rem; margin-top:0.25rem;">Enter your workspace & verified credentials</p>
       </div>
 
-      <div id="phoneStep" style="display:flex; flex-direction:column; gap:0.85rem;">
-        <div>
-          <label style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">Mobile Number</label>
-          <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
-            <div style="background:var(--input-bg); border:1px solid var(--border); color:var(--muted); border-radius:12px; padding:0.85rem 1rem; font-weight:600;">+91</div>
+      <div style="display:flex; flex-direction:column; gap:0.4rem;">
+        <label style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--muted);">Institute Domain</label>
+        <input type="text" id="instId" value="inst_apex" autocomplete="off" />
+      </div>
+
+      <!-- Phone Entry Screen -->
+      <div id="phoneStep" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="display:flex; flex-direction:column; gap:0.4rem;">
+          <label style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--muted);">Mobile Number</label>
+          <div style="display:flex; gap:0.5rem;">
+            <div style="background:#020617; border:1px solid var(--border); color:var(--muted); border-radius:12px; padding:0.85rem 1rem; font-weight:600;">+91</div>
             <input type="tel" id="phoneNumber" placeholder="9999999999" maxlength="10" inputmode="numeric" />
           </div>
         </div>
-        <button id="btnSendOtp" type="button">Send OTP</button>
+        <button id="btnSendOtp" type="button"><i data-lucide="arrow-right" style="width:18px;"></i> Send OTP</button>
       </div>
 
-      <div id="otpStep" class="hidden" style="display:flex; flex-direction:column; gap:0.85rem;">
-        <div>
-          <label style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">6-Digit OTP</label>
-          <input type="number" id="otpCode" placeholder="123456" maxlength="6" inputmode="numeric" style="margin-top:0.35rem;" />
+      <!-- Verification Screen -->
+      <div id="otpStep" class="hidden" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="display:flex; flex-direction:column; gap:0.4rem;">
+          <label style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--muted);">6-Digit OTP</label>
+          <input type="number" id="otpCode" placeholder="123456" maxlength="6" inputmode="numeric" />
         </div>
-        <button id="btnVerifyOtp" type="button">Verify & Launch</button>
-        <button id="btnResetPhone" type="button" class="secondary">Back</button>
+        <button id="btnVerifyOtp" type="button"><i data-lucide="check" style="width:18px;"></i> Verify & Launch</button>
+        <button id="btnResetPhone" type="button" class="btn-secondary">Change Number</button>
       </div>
 
       <div id="recaptchaContainer"></div>
@@ -289,40 +391,79 @@
     </div>
   </div>
 
-  <!-- WORKSPACE VIEW -->
+  <!-- ================= APP WORKSPACE ================= -->
   <div id="appView" class="hidden">
+    <!-- Header -->
     <header class="app-header">
-      <div style="display:flex; align-items:center; gap:0.5rem;">
+      <div class="brand-wrap">
         <h1>Trackie</h1>
-        <span class="badge" style="font-size:0.65rem;">FACULTY</span>
+        <span class="badge" id="roleBadge">FACULTY</span>
       </div>
-      <button id="btnSignOut" type="button" class="secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;">Exit</button>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <button id="btnSignOut" type="button" class="btn-secondary btn-sm"><i data-lucide="log-out" style="width:14px;"></i></button>
+      </div>
     </header>
 
-    <main class="app-main">
-      <!-- Batch / Class Filter -->
-      <div class="class-bar">
-        <div class="class-chip active" onclick="switchBatch(this, 'Batch A - CS')">Batch A (CS)</div>
-        <div class="class-chip" onclick="switchBatch(this, 'Batch B - IT')">Batch B (IT)</div>
-        <div class="class-chip" onclick="switchBatch(this, 'Batch C - AI')">Batch C (AI)</div>
+    <!-- Navigation Tabs -->
+    <nav class="nav-bar">
+      <div class="nav-tab active" data-tab="attendanceTab"><i data-lucide="calendar-check" style="width:16px;"></i> Attendance Register</div>
+      <div class="nav-tab" data-tab="noticesTab"><i data-lucide="bell" style="width:16px;"></i> Notice Board</div>
+    </nav>
+
+    <!-- Tab 1: Attendance Workspace -->
+    <main class="app-main" id="attendanceTab">
+      <!-- Batch Selector -->
+      <div class="batch-scroller">
+        <div class="batch-chip active" data-batch="Batch A - Computer Science">Batch A (CS)</div>
+        <div class="batch-chip" data-batch="Batch B - Information Tech">Batch B (IT)</div>
+        <div class="batch-chip" data-batch="Batch C - Artificial Intel">Batch C (AI)</div>
       </div>
 
-      <!-- Quick Actions / Submission Bar -->
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div class="section-title">Active Roll Sheet</div>
-          <p id="statsCounter" style="font-size:0.8rem; color:var(--muted); margin-top:0.15rem;">Present: 4 | Absent: 0</p>
+      <!-- Quick Metrics -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-val" id="countPresent" style="color:var(--present-text);">0</div>
+          <div class="metric-label">Present</div>
         </div>
-        <button id="btnSaveAttendance" type="button" style="font-size:0.85rem; padding:0.5rem 1rem;">Save Session</button>
+        <div class="metric-card">
+          <div class="metric-val" id="countAbsent" style="color:var(--absent-text);">0</div>
+          <div class="metric-label">Absent</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="countRate" style="color:var(--primary);">100%</div>
+          <div class="metric-label">Rate</div>
+        </div>
       </div>
 
-      <!-- Tap-to-toggle Attendance List -->
-      <div id="studentList" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+      <!-- Action Toolbar -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:0.85rem; font-weight:700; color:var(--muted); text-transform:uppercase;">Student Roster</div>
+        <div style="display:flex; gap:0.5rem;">
+          <button id="btnAllPresent" type="button" class="btn-secondary btn-sm">All Present</button>
+          <button id="btnSaveSession" type="button" class="btn-sm"><i data-lucide="cloud-upload" style="width:14px;"></i> Sync</button>
+        </div>
+      </div>
+
+      <!-- Student List -->
+      <div id="studentContainer" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+    </main>
+
+    <!-- Tab 2: Notices Workspace -->
+    <main class="app-main hidden" id="noticesTab">
+      <div class="notice-card">
+        <div style="font-size:0.85rem; font-weight:700; text-transform:uppercase; color:var(--muted);">Post Campus Announcement</div>
+        <input type="text" id="noticeTitle" placeholder="Title (e.g. Midterm Schedule)" style="margin-top:0.25rem;" />
+        <textarea id="noticeBody" rows="3" placeholder="Write message for students and faculty..." style="margin-top:0.25rem;"></textarea>
+        <button id="btnPostNotice" type="button" style="align-self:flex-end;" class="btn-sm"><i data-lucide="send" style="width:14px;"></i> Publish Notice</button>
+      </div>
+
+      <div style="font-size:0.85rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-top:0.5rem;">Recent Updates</div>
+      <div id="noticesList" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
     </main>
   </div>
 
   <script>
-    /* ================= FIREBASE INITIALIZATION ================= */
+    /* ================= FIREBASE CONFIG ================= */
     const firebaseConfig = {
       apiKey: "AIzaSyAYvNTQGUufhD12qr1rAgwgjteaxzvw21o",
       authDomain: "trackie-eec82.firebaseapp.com",
@@ -337,68 +478,156 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    /* ================= STUDENT ROSTER STATE ================= */
-    let currentBatch = 'Batch A - CS';
-    const students = [
-      { id: 1, name: "Aarav Sharma", roll: "01", status: "present" },
-      { id: 2, name: "Isha Patel", roll: "02", status: "present" },
-      { id: 3, name: "Rohan Verma", roll: "03", status: "present" },
-      { id: 4, name: "Sneha Nair", roll: "04", status: "present" },
-    ];
+    /* ================= STATE ================= */
+    let currentBatch = 'Batch A - Computer Science';
+    const rosterData = {
+      'Batch A - Computer Science': [
+        { id: '101', roll: '01', name: 'Aarav Sharma', status: 'present' },
+        { id: '102', roll: '02', name: 'Isha Patel', status: 'present' },
+        { id: '103', roll: '03', name: 'Rohan Verma', status: 'absent' },
+        { id: '104', roll: '04', name: 'Sneha Nair', status: 'present' },
+        { id: '105', roll: '05', name: 'Kabir Das', status: 'late' },
+        { id: '106', roll: '06', name: 'Ananya Roy', status: 'present' }
+      ],
+      'Batch B - Information Tech': [
+        { id: '201', roll: '01', name: 'Dev Malik', status: 'present' },
+        { id: '202', roll: '02', name: 'Priya Sen', status: 'present' },
+        { id: '203', roll: '03', name: 'Yash Joshi', status: 'present' }
+      ],
+      'Batch C - Artificial Intel': [
+        { id: '301', roll: '01', name: 'Vikram Seth', status: 'present' },
+        { id: '302', roll: '02', name: 'Tanvi Shah', status: 'present' }
+      ]
+    };
 
-    function renderStudents() {
-      const container = document.getElementById('studentList');
+    /* ================= UI RENDERING ================= */
+    function renderRoster() {
+      const container = document.getElementById('studentContainer');
       container.innerHTML = '';
-      let presentCount = 0;
+      const list = rosterData[currentBatch] || [];
 
-      students.forEach((s, idx) => {
-        if (s.status === 'present') presentCount++;
-        const card = document.createElement('div');
-        card.className = `student-card ${s.status}`;
-        card.onclick = () => toggleAttendance(idx);
-        card.innerHTML = `
-          <div class="student-info">
-            <span class="roll-pill">#${s.roll}</span>
+      let p = 0, a = 0;
+      list.forEach(s => {
+        if (s.status === 'present' || s.status === 'late') p++;
+        if (s.status === 'absent') a++;
+
+        const row = document.createElement('div');
+        row.className = `student-item ${s.status}`;
+        row.innerHTML = `
+          <div class="student-meta">
+            <span class="roll-tag">#${s.roll}</span>
             <span class="student-name">${s.name}</span>
           </div>
-          <div class="status-indicator">${s.status}</div>
+          <div class="action-triggers">
+            <button type="button" class="status-btn ${s.status === 'present' ? 'active-p' : ''}" onclick="setStatus('${s.id}', 'present')">P</button>
+            <button type="button" class="status-btn ${s.status === 'absent' ? 'active-a' : ''}" onclick="setStatus('${s.id}', 'absent')">A</button>
+            <button type="button" class="status-btn ${s.status === 'late' ? 'active-l' : ''}" onclick="setStatus('${s.id}', 'late')">L</button>
+          </div>
         `;
-        container.appendChild(card);
+        container.appendChild(row);
       });
 
-      document.getElementById('statsCounter').textContent = 
-        `Present: ${presentCount} | Absent: ${students.length - presentCount}`;
+      document.getElementById('countPresent').textContent = p;
+      document.getElementById('countAbsent').textContent = a;
+      const rate = list.length ? Math.round((p / list.length) * 100) : 100;
+      document.getElementById('countRate').textContent = rate + '%';
     }
 
-    function toggleAttendance(index) {
-      students[index].status = students[index].status === 'present' ? 'absent' : 'present';
-      renderStudents();
-    }
+    window.setStatus = (id, status) => {
+      const student = rosterData[currentBatch].find(s => s.id === id);
+      if (student) {
+        student.status = status;
+        renderRoster();
+      }
+    };
 
-    function switchBatch(el, batchName) {
-      document.querySelectorAll('.class-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      currentBatch = batchName;
-    }
+    /* Batch Switches */
+    document.querySelectorAll('.batch-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.batch-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentBatch = chip.getAttribute('data-batch');
+        renderRoster();
+      });
+    });
 
-    /* Save Session to Cloud Firestore */
-    document.getElementById('btnSaveAttendance').addEventListener('click', () => {
+    /* Mark All Present */
+    document.getElementById('btnAllPresent').addEventListener('click', () => {
+      (rosterData[currentBatch] || []).forEach(s => s.status = 'present');
+      renderRoster();
+    });
+
+    /* Save to Firestore */
+    document.getElementById('btnSaveSession').addEventListener('click', () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      const record = {
+      db.collection('attendance_logs').add({
         faculty: user.phoneNumber,
         batch: currentBatch,
+        date: new Date().toISOString().split('T')[0],
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        records: students
-      };
-
-      db.collection('attendance_logs').add(record).then(() => {
-        alert("Attendance recorded to Apex Cloud.");
+        records: rosterData[currentBatch]
+      }).then(() => {
+        alert("Session saved to Apex Cloud!");
       }).catch(err => alert("Sync error: " + err.message));
     });
 
-    /* ================= AUTHENTICATION FLOW ================= */
+    /* Tabs switching */
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-tab');
+        document.querySelectorAll('.app-main').forEach(m => m.classList.add('hidden'));
+        document.getElementById(target).classList.remove('hidden');
+      });
+    });
+
+    /* Notices realtime listener */
+    function subscribeNotices() {
+      db.collection('notices').orderBy('timestamp', 'desc').limit(15).onSnapshot(snap => {
+        const feed = document.getElementById('noticesList');
+        feed.innerHTML = '';
+        if (snap.empty) {
+          feed.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:0.85rem; padding:1.5rem;">No active broadcasts posted.</div>`;
+          return;
+        }
+        snap.forEach(doc => {
+          const d = doc.data();
+          const card = document.createElement('div');
+          card.className = 'notice-card';
+          card.innerHTML = `
+            <div class="notice-top">
+              <span style="font-weight:700; color:var(--primary);">${d.author || 'Apex Faculty'}</span>
+              <span>${d.date || 'Recent'}</span>
+            </div>
+            <div style="font-weight:700; font-size:1rem;">${d.title}</div>
+            <div style="font-size:0.875rem; color:var(--muted); line-height:1.4;">${d.body}</div>
+          `;
+          feed.appendChild(card);
+        });
+      });
+    }
+
+    document.getElementById('btnPostNotice').addEventListener('click', () => {
+      const title = document.getElementById('noticeTitle').value.trim();
+      const body = document.getElementById('noticeBody').value.trim();
+      if (!title || !body) return alert("Fill in title and body");
+
+      db.collection('notices').add({
+        title,
+        body,
+        author: auth.currentUser ? auth.currentUser.phoneNumber : 'Faculty',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('noticeTitle').value = '';
+        document.getElementById('noticeBody').value = '';
+      });
+    });
+
+    /* ================= AUTHENTICATION ================= */
     let confirmationResult = null;
     const authStatus = document.getElementById('authStatus');
 
@@ -406,33 +635,36 @@
 
     document.getElementById('btnSendOtp').addEventListener('click', () => {
       const num = document.getElementById('phoneNumber').value.trim();
-      if (num.length < 10) return alert("Enter valid 10-digit number");
+      if (num.length < 10) {
+        authStatus.textContent = "Please enter 10 digits";
+        authStatus.style.color = "var(--absent-text)";
+        return;
+      }
 
       authStatus.textContent = "Requesting code...";
       authStatus.style.color = "var(--primary)";
 
       auth.signInWithPhoneNumber("+91" + num, window.recaptchaVerifier)
-        .then(result => {
-          confirmationResult = result;
+        .then(res => {
+          confirmationResult = res;
           document.getElementById('phoneStep').classList.add('hidden');
           document.getElementById('otpStep').classList.remove('hidden');
-          authStatus.textContent = "Code sent!";
+          authStatus.textContent = "OTP code generated.";
         })
         .catch(err => {
           authStatus.textContent = err.message;
-          authStatus.style.color = "var(--danger)";
+          authStatus.style.color = "var(--absent-text)";
         });
     });
 
     document.getElementById('btnVerifyOtp').addEventListener('click', () => {
       const code = document.getElementById('otpCode').value.trim();
       authStatus.textContent = "Verifying...";
-
       confirmationResult.confirm(code)
-        .then(() => authStatus.textContent = "")
+        .then(() => { authStatus.textContent = ""; })
         .catch(err => {
-          authStatus.textContent = "Invalid code. Please retry.";
-          authStatus.style.color = "var(--danger)";
+          authStatus.textContent = "Invalid code. Check and retry.";
+          authStatus.style.color = "var(--absent-text)";
         });
     });
 
@@ -448,19 +680,22 @@
       if (user) {
         document.getElementById('authView').classList.add('hidden');
         document.getElementById('appView').classList.remove('hidden');
-        renderStudents();
+        renderRoster();
+        subscribeNotices();
       } else {
         document.getElementById('appView').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('phoneStep').classList.remove('hidden');
         document.getElementById('otpStep').classList.add('hidden');
       }
+      lucide.createIcons();
     });
 
     /* Service Worker */
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/Trackie/sw.js').catch(() => {});
     }
+    window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
   </script>
 </body>
 </html>
