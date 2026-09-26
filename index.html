@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackie. — Workspace</title>
+  
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121214" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+
+  <style>
+    :root {
+      --brand-orange: #FF5A1F;
+      --brand-black: #121214;
+      --bg: #F4F4F6;
+      --surface: #FFFFFF;
+      --surface-subtle: #F9F9FA;
+      --text: #121214;
+      --text-muted: #71717A;
+      --border: #E4E4E7;
+      --border-subtle: #F0F0F2;
+      --success: #16A34A;
+      --success-bg: #DCFCE7;
+      --danger: #DC2626;
+      --danger-bg: #FEE2E2;
+      --warning: #D97706;
+      --warning-bg: #FEF3C7;
+      --radius: 8px;
+    }
+
+
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); font-size: 13px; display: flex; justify-content: center; min-height: 100vh; }
+    .hidden { display: none !important; }
+
+
+    .app-container { width: 100%; max-width: 960px; display: flex; min-height: 100vh; background: var(--surface); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .brand-wordmark { font-size: 20px; font-weight: 900; letter-spacing: -0.8px; color: var(--text); display: inline-flex; align-items: baseline; }
+    .brand-wordmark .dot { width: 6px; height: 6px; background-color: var(--brand-orange); margin-left: 2px; border-radius: 1px; }
+
+
+    aside.sidebar { width: 250px; background: #FFFFFF; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-header { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .workspace-subname { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+    .nav-section { padding: 14px 10px; flex: 1; overflow-y: auto; }
+    .section-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); padding: 6px 10px; }
+    .channel-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius); color: #3F3F46; cursor: pointer; font-weight: 600; }
+    .channel-item.active { background: var(--brand-black); color: #FFFFFF; }
+    .sidebar-footer { padding: 12px 14px; border-top: 1px solid var(--border); background: #FAFAFA; display: flex; flex-direction: column; gap: 6px; }
+
+
+    main.content-area { flex: 1; display: flex; flex-direction: column; background: #FFFFFF; overflow-y: auto; }
+    .top-header { height: 54px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .header-channel-name { font-size: 14px; font-weight: 800; }
+    .view-panel { padding: 20px; flex: 1; }
+
+
+    .card-box { background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+    input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; outline: none; background: #FFFFFF; }
+    
+    .btn { padding: 8px 14px; border-radius: var(--radius); font-weight: 700; font-size: 12px; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
+    .btn-brand { background: var(--brand-black); color: #FFFFFF; }
+    .btn-ghost { background: #FFFFFF; border: 1px solid var(--border); color: var(--text); }
+    .btn-danger-ghost { background: transparent; border: 1px solid var(--border); color: var(--danger); }
+
+
+    .toggle-group { display: flex; gap: 4px; }
+    .btn-toggle { width: 38px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: #FFFFFF; font-weight: 800; cursor: pointer; }
+    .btn-toggle.active-p { background: var(--success); color: #fff; border-color: var(--success); }
+    .btn-toggle.active-l { background: var(--warning); color: #fff; border-color: var(--warning); }
+    .btn-toggle.active-a { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+
+    .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .badge-present { background: var(--success-bg); color: var(--success); }
+    .badge-absent { background: var(--danger-bg); color: var(--danger); }
+
+
+    #auth-screen { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100vh; }
+    .auth-card { width: 100%; max-width: 400px; background: #FFFFFF; border-radius: 12px; padding: 32px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+  </style>
+</head>
+<body>
+
+
+  <!-- AUTH SCREEN WITH FIREBASE PHONE OTP -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div style="margin-bottom: 20px;">
+        <span class="brand-wordmark" style="font-size: 26px;">Trackie<span class="dot"></span></span>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Sign in via secure phone verification</p>
+      </div>
+
+
+      <label>Workspace / Institute ID</label>
+      <input type="text" id="auth-inst-id" value="inst_apex" placeholder="e.g. inst_apex" style="margin-bottom: 12px;" />
+
+
+      <!-- Step 1: Phone Entry -->
+      <div id="auth-step-phone">
+        <label>Mobile Number (10 Digits)</label>
+        <div style="display: flex; gap: 6px; margin-bottom: 16px;">
+          <span style="display:flex; align-items:center; padding:0 10px; background:var(--surface-subtle); border:1px solid var(--border); border-radius:var(--radius); font-weight:700;">+91</span>
+          <input type="tel" id="auth-phone" placeholder="9876543210" maxlength="10" />
+        </div>
+
+
+        <div id="recaptcha-container"></div>
+        <button class="btn btn-brand" id="btn-send-otp" style="width: 100%; padding: 10px;" onclick="sendPhoneOTP()">Send OTP</button>
+      </div>
+
+
+      <!-- Step 2: OTP Verification -->
+      <div id="auth-step-otp" class="hidden">
+        <label>Enter 6-Digit SMS Verification Code</label>
+        <input type="number" id="auth-otp" placeholder="123456" maxlength="6" style="letter-spacing: 4px; font-size: 16px; text-align: center; margin-bottom: 16px;" />
+        <button class="btn btn-brand" id="btn-verify-otp" style="width: 100%; padding: 10px; margin-bottom: 8px;" onclick="verifyPhoneOTP()">Verify & Launch</button>
+        <button class="btn btn-ghost" style="width: 100%; padding: 6px;" onclick="resetAuthFlow()">Change Phone Number</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- WORKSPACE APP -->
+  <div id="workspace-app" class="app-container hidden">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="brand-wordmark">Trackie<span class="dot"></span></span>
+        <div class="workspace-subname" id="side-inst-name">Cloud Workspace</div>
+      </div>
+
+
+      <div class="nav-section">
+        <div class="channel-item active" id="chan-notices" onclick="switchChannel('notices')"># notices-feed</div>
+        
+        <div id="prof-channel-group" class="hidden">
+          <div class="section-label">Academics</div>
+          <div class="channel-item" id="chan-attendance" onclick="switchChannel('attendance')"># class-attendance</div>
+          <div class="channel-item" id="chan-marks" onclick="switchChannel('marks')"># exam-results</div>
+          <div class="channel-item" id="chan-roster" onclick="switchChannel('roster')"># student-roster</div>
+        </div>
+
+
+        <div id="student-channel-group" class="hidden">
+          <div class="section-label">Portal</div>
+          <div class="channel-item" id="chan-student-metrics" onclick="switchChannel('student-metrics')"># student-dashboard</div>
+        </div>
+      </div>
+
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost" onclick="enablePushNotifications()">🔔 Phone Alerts</button>
+        <button class="btn btn-danger-ghost" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </aside>
+
+
+    <main class="content-area">
+      <div class="top-header">
+        <div class="header-channel-name" id="view-title"># notices-feed</div>
+      </div>
+
+
+      <!-- NOTICES FEED -->
+      <div id="panel-notices" class="view-panel">
+        <div id="notice-composer-box" class="card-box hidden">
+          <label>Broadcast Campus Announcement</label>
+          <input type="text" id="post-title" placeholder="Notice title..." style="margin-bottom: 8px;" />
+          <textarea id="post-body" placeholder="Write notice details..." style="margin-bottom: 12px;"></textarea>
+          <button class="btn btn-brand" onclick="submitCloudNotice()">Publish Notice (Syncs to All Phones)</button>
+        </div>
+        <div id="notices-stream"></div>
+      </div>
+
+
+      <!-- ATTENDANCE -->
+      <div id="panel-attendance" class="view-panel hidden">
+        <div class="card-box">
+          <div class="form-grid">
+            <div>
+              <label>Select Class</label>
+              <select id="att-class-select" onchange="loadClassRoster()"></select>
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="date" id="att-date" onchange="loadClassRoster()" />
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <input type="text" id="att-subject" value="Mathematics" placeholder="Subject" style="max-width: 200px;" />
+            <button class="btn btn-ghost" onclick="exportAttendanceExcel()">📊 Export Sheet (.xlsx)</button>
+          </div>
+          <div id="att-roster-list" style="margin-bottom: 16px;"></div>
+          <button class="btn btn-brand" onclick="saveCloudAttendance()">Sync Attendance to Cloud</button>
+        </div>
+      </div>
+
+
+      <!-- MARKS -->
+      <div id="panel-marks" class="view-panel hidden">
+        <div class="card-box">
+          <div class="form-grid">
+            <div>
+              <label>Select Class</label>
+              <select id="marks-class-select" onchange="renderMarksRoster()"></select>
+            </div>
+            <div>
+              <label>Exam Name</label>
+              <input type="text" id="bulk-exam-title" placeholder="e.g. Mid-Term Examination" />
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <input type="number" id="bulk-exam-total" placeholder="Max Marks (e.g. 100)" style="max-width: 200px;" />
+            <button class="btn btn-ghost" onclick="exportMarksExcel()">📊 Export Marks (.xlsx)</button>
+          </div>
+          <div id="bulk-marks-roster" style="margin-bottom: 16px;"></div>
+          <button class="btn btn-brand" onclick="saveCloudMarks()">Save & Sync Scores to Cloud</button>
+        </div>
+      </div>
+
+
+      <!-- ROSTER -->
+      <div id="panel-roster" class="view-panel hidden">
+        <div class="card-box">
+          <label>Add Student to Cloud</label>
+          <div class="form-grid">
+            <input type="text" id="new-std-roll" placeholder="Roll No (e.g. 101)" />
+            <input type="text" id="new-std-name" placeholder="Full Student Name" />
+          </div>
+          <div class="form-grid">
+            <input type="tel" id="new-std-phone" placeholder="Parent 10-Digit Mobile" maxlength="10" />
+            <input type="text" id="new-std-class" placeholder="Class Name (e.g. CS-A)" />
+          </div>
+          <button class="btn btn-brand" onclick="addStudentToCloud()">Enroll to Cloud Database</button>
+          <hr style="margin: 18px 0; border: none; border-top: 1px solid var(--border);" />
+          <label>Active Class Directory</label>
+          <div id="cloud-student-directory"></div>
+        </div>
+      </div>
+
+
+      <!-- STUDENT PORTAL -->
+      <div id="panel-student-metrics" class="view-panel hidden">
+        <div class="card-box">
+          <h2 id="std-disp-name" style="font-size: 18px; font-weight: 800;">Student Name</h2>
+          <p id="std-disp-info" style="color: var(--text-muted); margin-bottom: 16px;">Class Info</p>
+          <label>Exam Results (Live from Cloud)</label>
+          <div id="std-results-list" style="margin-bottom: 16px;"></div>
+          <label>Attendance History (Live from Cloud)</label>
+          <div id="std-attendance-list"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+
+<script>
+  /* ================= INSERT YOUR FIREBASE CONFIG ================= */
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+
+  firebase.initializeApp(firebaseConfig);
+  const cloudDB = firebase.firestore();
+
+
+  let currentUser = null;
+  let currentClassStudents = [];
+  let attendanceBuffer = {};
+  let marksBuffer = {};
+  let confirmationResultRef = null;
+
+
+  /* ================= FIREBASE PHONE AUTH ================= */
+  function initRecaptcha() {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible'
+      });
+    }
+  }
+
+
+  async function sendPhoneOTP() {
+    const instId = document.getElementById('auth-inst-id').value.trim();
+    const phone = document.getElementById('auth-phone').value.trim();
+
+
+    if (!instId) return alert('Enter Institute ID.');
+    if (phone.length !== 10 || isNaN(phone)) return alert('Enter valid 10-digit mobile.');
+
+
+    const sendBtn = document.getElementById('btn-send-otp');
+    sendBtn.disabled = true;
+    sendBtn.innerText = 'Sending OTP...';
+
+
+    try {
+      initRecaptcha();
+      confirmationResultRef = await firebase.auth().signInWithPhoneNumber('+91' + phone, window.recaptchaVerifier);
+      document.getElementById('auth-step-phone').classList.add('hidden');
+      document.getElementById('auth-step-otp').classList.remove('hidden');
+      document.getElementById('auth-otp').focus();
+    } catch (err) {
+      console.error(err);
+      alert('Error sending OTP: ' + err.message);
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
+      }
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerText = 'Send OTP';
+    }
+  }
+
+
+  async function verifyPhoneOTP() {
+    const otp = document.getElementById('auth-otp').value.trim();
+    if (!otp || otp.length !== 6) return alert('Enter 6-digit OTP code.');
+
+
+    const verifyBtn = document.getElementById('btn-verify-otp');
+    verifyBtn.disabled = true;
+    verifyBtn.innerText = 'Verifying...';
+
+
+    try {
+      const res = await confirmationResultRef.confirm(otp);
+      const rawPhone = res.user.phoneNumber.replace('+91', '');
+      const instId = document.getElementById('auth-inst-id').value.trim();
+      await resolveUserRole(instId, rawPhone, res.user.uid);
+    } catch (err) {
+      alert('Invalid or expired OTP: ' + err.message);
+    } finally {
+      verifyBtn.disabled = false;
+      verifyBtn.innerText = 'Verify & Launch';
+    }
+  }
+
+
+  async function resolveUserRole(instId, phone, uid) {
+    // 1. Check Faculty
+    const profDoc = await cloudDB.collection('institutes').doc(instId).collection('professors').doc(phone).get();
+    if (profDoc.exists) {
+      currentUser = { role: 'professor', phone, instId, uid, data: profDoc.data() };
+      launchApp();
+      return;
+    }
+
+
+    // 2. Check Student
+    const studentQuery = await cloudDB.collection('institutes').doc(instId).collection('students').where('phone', '==', phone).get();
+    if (!studentQuery.empty) {
+      const sData = studentQuery.docs[0].data();
+      sData.id = studentQuery.docs[0].id;
+      currentUser = { role: 'student', phone, instId, uid, data: sData };
+      launchApp();
+      return;
+    }
+
+
+    // 3. First time admin bootstrap
+    const confirmAdmin = confirm("No existing profile found. Create this phone number as the Institute Administrator?");
+    if (confirmAdmin) {
+      await cloudDB.collection('institutes').doc(instId).collection('professors').doc(phone).set({
+        name: "Institute Admin",
+        phone: phone,
+        uid: uid,
+        designation: "Principal / Administrator",
+        canApprove: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      currentUser = { role: 'professor', phone, instId, uid, data: { name: "Institute Admin" } };
+      launchApp();
+    } else {
+      await firebase.auth().signOut();
+      resetAuthFlow();
+    }
+  }
+
+
+  function resetAuthFlow() {
+    document.getElementById('auth-step-otp').classList.add('hidden');
+    document.getElementById('auth-step-phone').classList.remove('hidden');
+    document.getElementById('auth-otp').value = '';
+  }
+
+
+  function launchApp() {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('workspace-app').classList.remove('hidden');
+
+
+    const isStaff = currentUser.role === 'professor';
+    document.getElementById('prof-channel-group').classList.toggle('hidden', !isStaff);
+    document.getElementById('notice-composer-box').classList.toggle('hidden', !isStaff);
+    document.getElementById('student-channel-group').classList.toggle('hidden', isStaff);
+
+
+    listenToCloudNotices();
+
+
+    if (isStaff) {
+      loadClassDropdowns();
+      loadCloudStudentDirectory();
+    } else {
+      listenToStudentData();
+    }
+
+
+    switchChannel('notices');
+  }
+
+
+  async function handleLogout() {
+    await firebase.auth().signOut();
+    currentUser = null;
+    resetAuthFlow();
+    document.getElementById('workspace-app').classList.add('hidden');
+    document.getElementById('auth-screen').classList.remove('hidden');
+  }
+
+
+  function switchChannel(chan) {
+    document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+
+
+    document.getElementById(`chan-${chan}`)?.classList.add('active');
+    document.getElementById(`panel-${chan}`)?.classList.remove('hidden');
+    document.getElementById('view-title').innerText = `# ${chan}`;
+
+
+    if (chan === 'attendance') loadClassRoster();
+    if (chan === 'marks') renderMarksRoster();
+  }
+
+
+  /* ================= NOTICES ================= */
+  function listenToCloudNotices() {
+    cloudDB.collection('institutes').doc(currentUser.instId)
+      .collection('notices').orderBy('timestamp', 'desc')
+      .onSnapshot((snapshot) => {
+        const stream = document.getElementById('notices-stream');
+        stream.innerHTML = '';
+        if (snapshot.empty) {
+          stream.innerHTML = `<div style="color:var(--text-muted); padding:10px 0;">No notices posted yet.</div>`;
+          return;
+        }
+        snapshot.forEach(doc => {
+          const n = doc.data();
+          const dateStr = n.timestamp ? new Date(n.timestamp.toDate()).toLocaleDateString() : 'Just now';
+          stream.innerHTML += `
+            <div style="border: 1px solid var(--border-subtle); padding: 12px; border-radius: var(--radius); margin-bottom: 10px;">
+              <div style="font-weight: 800; font-size: 14px;">${n.title}</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">${dateStr}</div>
+              <p>${n.body}</p>
+            </div>`;
+        });
+      });
+  }
+
+
+  async function submitCloudNotice() {
+    const title = document.getElementById('post-title').value.trim();
+    const body = document.getElementById('post-body').value.trim();
+    if (!title || !body) return alert("Fill title and body.");
+
+
+    await cloudDB.collection('institutes').doc(currentUser.instId).collection('notices').add({
+      title, body, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-body').value = '';
+    alert("Notice published to cloud.");
+  }
+
+
+  /* ================= ROSTER ================= */
+  async function addStudentToCloud() {
+    const roll = document.getElementById('new-std-roll').value.trim();
+    const name = document.getElementById('new-std-name').value.trim();
+    const phone = document.getElementById('new-std-phone').value.trim();
+    const className = document.getElementById('new-std-class').value.trim();
+
+
+    if (!roll || !name || phone.length !== 10 || !className) {
+      return alert("Complete all student fields.");
+    }
+
+
+    const docId = `${className}_${roll}`.replace(/\s+/g, '_');
+    await cloudDB.collection('institutes').doc(currentUser.instId).collection('students').doc(docId).set({
+      roll, name, phone, className, attendance: [], results: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+
+    alert(`Student ${name} added.`);
+    document.getElementById('new-std-roll').value = '';
+    document.getElementById('new-std-name').value = '';
+    document.getElementById('new-std-phone').value = '';
+    loadClassDropdowns();
+    loadCloudStudentDirectory();
+  }
+
+
+  async function loadCloudStudentDirectory() {
+    const container = document.getElementById('cloud-student-directory');
+    const snapshot = await cloudDB.collection('institutes').doc(currentUser.instId).collection('students').orderBy('className').get();
+    container.innerHTML = '';
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      container.innerHTML += `
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-subtle);">
+          <div>
+            <strong>${s.name}</strong> (#${s.roll}) — Class: ${s.className}
+            <div style="font-size:11px; color:var(--text-muted);">Parent Phone: ${s.phone}</div>
+          </div>
+        </div>`;
+    });
+  }
+
+
+  async function loadClassDropdowns() {
+    const snapshot = await cloudDB.collection('institutes').doc(currentUser.instId).collection('students').get();
+    const classes = new Set();
+    snapshot.forEach(doc => classes.add(doc.data().className));
+
+
+    const attSel = document.getElementById('att-class-select');
+    const marksSel = document.getElementById('marks-class-select');
+    attSel.innerHTML = ''; marksSel.innerHTML = '';
+    classes.forEach(c => {
+      attSel.innerHTML += `<option value="${c}">${c}</option>`;
+      marksSel.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
+
+
+  /* ================= ATTENDANCE ================= */
+  async function loadClassRoster() {
+    const className = document.getElementById('att-class-select').value;
+    if (!className) return;
+
+
+    const list = document.getElementById('att-roster-list');
+    list.innerHTML = 'Loading roster...';
+
+
+    const snapshot = await cloudDB.collection('institutes').doc(currentUser.instId)
+      .collection('students').where('className', '==', className).get();
+
+
+    currentClassStudents = [];
+    attendanceBuffer = {};
+    list.innerHTML = '';
+
+
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      s.docId = doc.id;
+      currentClassStudents.push(s);
+      attendanceBuffer[s.docId] = 'Present';
+
+
+      list.innerHTML += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-subtle);">
+          <div><strong>${s.name}</strong> (#${s.roll})</div>
+          <div class="toggle-group">
+            <button class="btn-toggle active-p" id="p-${s.docId}" onclick="setAttendanceStatus('${s.docId}', 'Present')">P</button>
+            <button class="btn-toggle" id="l-${s.docId}" onclick="setAttendanceStatus('${s.docId}', 'Leave')">L</button>
+            <button class="btn-toggle" id="a-${s.docId}" onclick="setAttendanceStatus('${s.docId}', 'Absent')">A</button>
+          </div>
+        </div>`;
+    });
+  }
+
+
+  function setAttendanceStatus(docId, status) {
+    attendanceBuffer[docId] = status;
+    document.getElementById(`p-${docId}`).className = (status === 'Present') ? 'btn-toggle active-p' : 'btn-toggle';
+    document.getElementById(`l-${docId}`).className = (status === 'Leave') ? 'btn-toggle active-l' : 'btn-toggle';
+    document.getElementById(`a-${docId}`).className = (status === 'Absent') ? 'btn-toggle active-a' : 'btn-toggle';
+  }
+
+
+  async function saveCloudAttendance() {
+    const date = document.getElementById('att-date').value;
+    const subject = document.getElementById('att-subject').value.trim() || 'General';
+    if (!date) return alert("Select date.");
+
+
+    const batch = cloudDB.batch();
+    for (let s of currentClassStudents) {
+      const status = attendanceBuffer[s.docId] || 'Present';
+      const ref = cloudDB.collection('institutes').doc(currentUser.instId).collection('students').doc(s.docId);
+      const past = s.attendance || [];
+      const updated = past.filter(a => !(a.date === date && a.subject === subject));
+      updated.unshift({ date, subject, status });
+      batch.update(ref, { attendance: updated });
+    }
+    await batch.commit();
+    alert("Attendance synced to cloud.");
+  }
+
+
+  /* ================= MARKS ================= */
+  async function renderMarksRoster() {
+    const className = document.getElementById('marks-class-select').value;
+    if (!className) return;
+
+
+    const list = document.getElementById('bulk-marks-roster');
+    list.innerHTML = 'Loading students...';
+
+
+    const snapshot = await cloudDB.collection('institutes').doc(currentUser.instId)
+      .collection('students').where('className', '==', className).get();
+
+
+    currentClassStudents = [];
+    marksBuffer = {};
+    list.innerHTML = '';
+
+
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      s.docId = doc.id;
+      currentClassStudents.push(s);
+
+
+      list.innerHTML += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border-subtle);">
+          <div><strong>${s.name}</strong> (#${s.roll})</div>
+          <input type="number" placeholder="Score" style="width:100px;" oninput="marksBuffer['${s.docId}'] = this.value" />
+        </div>`;
+    });
+  }
+
+
+  async function saveCloudMarks() {
+    const exam = document.getElementById('bulk-exam-title').value.trim();
+    const total = Number(document.getElementById('bulk-exam-total').value);
+
+
+    if (!exam || isNaN(total) || total <= 0) return alert("Enter exam title and max marks.");
+
+
+    const batch = cloudDB.batch();
+    let count = 0;
+
+
+    for (let s of currentClassStudents) {
+      const score = marksBuffer[s.docId];
+      if (score !== undefined && score !== '') {
+        const ref = cloudDB.collection('institutes').doc(currentUser.instId).collection('students').doc(s.docId);
+        const past = s.results || [];
+        const updated = past.filter(r => r.exam !== exam);
+        updated.unshift({ exam, scored: Number(score), total });
+        batch.update(ref, { results: updated });
+        count++;
+      }
+    }
+
+
+    if (count === 0) return alert("Enter marks for at least one student.");
+    await batch.commit();
+    alert(`Published scores for ${count} students.`);
+    document.getElementById('bulk-exam-title').value = '';
+    document.getElementById('bulk-exam-total').value = '';
+  }
+
+
+  /* ================= STUDENT DASHBOARD ================= */
+  function listenToStudentData() {
+    cloudDB.collection('institutes').doc(currentUser.instId)
+      .collection('students').doc(currentUser.data.id)
+      .onSnapshot(doc => {
+        if (!doc.exists) return;
+        const s = doc.data();
+
+
+        document.getElementById('std-disp-name').innerText = s.name;
+        document.getElementById('std-disp-info').innerText = `Class: ${s.className} • Roll #${s.roll}`;
+
+
+        const resBox = document.getElementById('std-results-list');
+        resBox.innerHTML = '';
+        (s.results || []).forEach(r => {
+          resBox.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle);">
+              <span>${r.exam}</span>
+              <strong>${r.scored} / ${r.total}</strong>
+            </div>`;
+        });
+
+
+        const attBox = document.getElementById('std-attendance-list');
+        attBox.innerHTML = '';
+        (s.attendance || []).forEach(a => {
+          attBox.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-subtle);">
+              <span>${a.subject} (${a.date})</span>
+              <span class="badge ${a.status === 'Present' ? 'badge-present' : 'badge-absent'}">${a.status}</span>
+            </div>`;
+        });
+      });
+  }
+
+
+  /* ================= EXCEL EXPORTS ================= */
+  function exportAttendanceExcel() {
+    const rows = currentClassStudents.map(s => {
+      const att = s.attendance || [];
+      const pres = att.filter(a => a.status === 'Present').length;
+      return {
+        'Roll': s.roll,
+        'Name': s.name,
+        'Phone': s.phone,
+        'Total': att.length,
+        'Present': pres,
+        'Rate': att.length === 0 ? '0%' : Math.round((pres / att.length) * 100) + '%'
+      };
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+    XLSX.writeFile(wb, "Attendance_Report.xlsx");
+  }
+
+
+  function exportMarksExcel() {
+    const rows = currentClassStudents.map(s => {
+      const row = { 'Roll': s.roll, 'Name': s.name };
+      (s.results || []).forEach(r => { row[`${r.exam} (${r.total})`] = r.scored; });
+      return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Marks");
+    XLSX.writeFile(wb, "Marks_Report.xlsx");
+  }
+
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    document.getElementById('att-date').value = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(console.warn);
+    }
+  });
+
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (user && !currentUser) {
+      const rawPhone = user.phoneNumber ? user.phoneNumber.replace('+91', '') : '';
+      const instId = document.getElementById('auth-inst-id').value.trim() || 'inst_apex';
+      if (rawPhone) {
+        await resolveUserRole(instId, rawPhone, user.uid);
+      }
+    }
+  });
+</script>
+</body>
+</html>
+
